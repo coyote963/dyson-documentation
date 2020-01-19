@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=11' />
+    <title>Bman Api</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href='css/base.css' rel='stylesheet' />
+    <link href='css/style.css' rel='stylesheet' />
+    <link href='css/railscasts.css' rel='stylesheet' />
+  </head>
+  <body>
+    <!--START--><div id='app'><div class="container unlimiter" data-reactroot="" data-reactid="1" data-react-checksum="230161597"><div class="fixed-top fixed-right space-left16" data-reactid="2"><div class="fill-light col6 pin-right" data-reactid="3"></div></div><div class="space-top5 scroll-styled overflow-auto pad1 width16 sidebar fixed-left fill-dark dark" data-reactid="4"><div class="pad0x small" data-reactid="5"><div class="small pad0x quiet space-top1" data-reactid="6">Introduction</div><a href="#dyson-city-api" class="line-height15 pad0x pad00y quiet block " data-reactid="7">Dyson City API</a><div class="small pad0x quiet space-top1" data-reactid="8">Players</div><a href="#players-profiles" class="line-height15 pad0x pad00y quiet block " data-reactid="9">Players Profiles</a><div class="small pad0x quiet space-top1" data-reactid="10">Deathmatch</div><a href="#deathmatch-profiles" class="line-height15 pad0x pad00y quiet block " data-reactid="11">Deathmatch Profiles</a><a href="#deathmatch-kills" class="line-height15 pad0x pad00y quiet block " data-reactid="12">Deathmatch Kills</a></div></div><div class="space-left16" data-reactid="13"><div class="" data-reactid="14"><div class="clearfix" data-reactid="15"><div data-title="Dyson City API" class="keyline-top section contain clearfix " data-reactid="16"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="17"><h2 id="dyson-city-api">Dyson City API</h2>
+<p>Welcome to the Dyson City API! Here you can reference how to retrieve data from the Boring Man databases using HTTP or TCP/UDP. This API was designed with <code>www.bman.gg</code> in mind, so the endpoints are the minimal endpoints necessary to build the functioning page. However, I am open to suggestions to new endpoints.</p>
+</div></div><div data-title="How does Dyson.city work?" class="keyline-top section contain clearfix " data-reactid="18"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="19"><h3 id="how-does-dysoncity-work">How does Dyson.city work?</h3>
+<p>Every time kills, chats, or players join a Boring Man V2 server, their information is stored and updated in a central database. Each packet of data is transfered via the RCON interface provided by the game.</p>
+<p>After this information is stored, you can query data from the database using the endpoints documented below. As for now there is no rate limit.</p>
+<p>Rating system is implemented with Microsoft's Trueskill rating system, that uses Bayesian inference to dynamically adjust player's ratings. If you would like to know more please read Microsoft's documentation on how their rating system works.</p>
+</div></div><div data-title="Players Profiles" class="keyline-top section contain clearfix " data-reactid="20"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="21"><h2 id="players-profiles">Players Profiles</h2>
+<p>Endpoints relating to players. Player is the base model that gamemode profiles are based off of. Each player endpoint is uniquely identified by their "platform" and "profile". Platform is what game store they got bman from <code>0 = steam, 1 = discord, 2 = itch.io 3 = gamejolt</code>. The colors of each player is stored as a gamejolt color value</p>
+</div></div><div data-title="List players" class="keyline-top section contain clearfix " data-reactid="22"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="23"><h3 id="list-players">List players</h3>
+<p>Lists all the players in the database. By default this only lists 10 entries and the first page. Other options you can specify what page you want. This is great for pagination on websites and keeps requests fast. Each API call also returns the total number of pages in the database. </p>
+<p>If you don't provide a pagenumber it will automatically default to the first page.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="24"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>/players/<span class="strong">{pagenumber}</span></div>
+    </div>
+<h4 id="example-request">Example request</h4>
+<pre class='hljs'>$ curl https://bman.gg/players/{pagenumber}</pre>
+<h4 id="example-response">Example response</h4>
+<pre class='hljs'>{
+  <span class="hljs-attr">"docs"</span> : [
+    {
+      <span class="hljs-attr">"_id"</span> : {
+        <span class="hljs-attr">"profile"</span> : <span class="hljs-string">"76561197960287930"</span>,
+        <span class="hljs-attr">"platform"</span> : <span class="hljs-string">"0"</span>
+      },
+      <span class="hljs-attr">"ip"</span> : [
+        <span class="hljs-string">"127.0.0.1"</span>
+      ],
+      <span class="hljs-attr">"name"</span> : [
+        <span class="hljs-string">"gabelogannewell"</span>
+      ],
+      <span class="hljs-attr">"color"</span> : <span class="hljs-string">"10789796"</span>,
+      <span class="hljs-attr">"premium"</span> : <span class="hljs-string">"1"</span>,
+      <span class="hljs-attr">"hat"</span> : <span class="hljs-string">"1"</span>
+    }
+  ],
+  <span class="hljs-attr">"totalDocs"</span>: <span class="hljs-number">2006</span>,
+  <span class="hljs-attr">"limit"</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-attr">"totalPages"</span>: <span class="hljs-number">201</span>,
+  <span class="hljs-attr">"page"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"pagingCounter"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"hasPrevPage"</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">"hasNextPage"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"prevPage"</span>: <span class="hljs-literal">null</span>,
+  <span class="hljs-attr">"nextPage"</span>: <span class="hljs-number">2</span>
+}</pre>
+</div></div><div data-title="Search by name" class="keyline-top section contain clearfix " data-reactid="25"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="26"><h3 id="search-by-name">Search by name</h3>
+<p>Searches the player database for a player's name. It searches by the substring of every player's name. It is case insensitive and returns all the results that contain the search term</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="27"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>players/name/<span class="strong">{name}</span></div>
+    </div>
+<h4 id="example-request-1">Example request</h4>
+<pre class='hljs'>curl https://bman.gg/players/name/{name}</pre>
+<h4 id="example-response-1">Example response</h4>
+<pre class='hljs'>[
+    {
+        "_id": {
+            "platform": {store},
+            "profile": {steamid}
+        },
+        "ip": [
+            {ip},
+            {ip}
+        ],
+        "name": [
+            {name},
+            {name}
+        ],
+        "color": {color},
+        "hat": {hat},
+        "premium": {premium status}
+    },
+    {
+        "_id": {
+            "platform": {store},
+            "profile": {steamid}
+        },
+        "ip": [
+            {ip},
+            {ip}
+        ],
+        "name": [
+            {name},
+            {name}
+        ],
+        "color": {color},
+        "hat": {hat},
+        "premium": {premium status}
+    }
+]</pre>
+</div></div><div data-title="Retrieve a player" class="keyline-top section contain clearfix " data-reactid="28"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="29"><h3 id="retrieve-a-player">Retrieve a player</h3>
+<p>Returns a single player.</p>
+<p>Retrieve information for a single player. The profile id and the platform in combination uniquely identify a player, so this request will return at most one record. <code>platform</code> is a number representing steam, discord, itch.io or gamejolt. <code>profileid</code> is their id on that platform.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="30"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>/players/<span class="strong">{profileid}</span>/platform/<span class="strong">{platform}</span></div>
+    </div>
+<h4 id="example-request-2">Example request</h4>
+<pre class='hljs'>curl https://bman.gg/players/76561198303147008/platform/0</pre>
+<h4 id="example-response-2">Example response</h4>
+<pre class='hljs'>[
+    {
+        <span class="hljs-attr">"_id"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198303147008"</span>
+        },
+        <span class="hljs-attr">"ip"</span>: [
+            <span class="hljs-string">"127.0.0.1"</span>
+        ],
+        <span class="hljs-attr">"name"</span>: [
+            <span class="hljs-string">"coyote and bird"</span>
+        ],
+        <span class="hljs-attr">"color"</span>: <span class="hljs-string">"1783114"</span>,
+        <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"0"</span>,
+        <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"1"</span>
+    }
+]</pre>
+</div></div><div data-title="Deathmatch Profiles" class="keyline-top section contain clearfix " data-reactid="31"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="32"><h2 id="deathmatch-profiles">Deathmatch Profiles</h2>
+<p>Deathmatch profiles contain information relating to a player's activity in Spasman's Deathmatch server. These profiles use the same Trueskill rating system that is used in TDM but simply applied to 1v1's. </p>
+</div></div><div data-title="List deathmatch profiles" class="keyline-top section contain clearfix " data-reactid="33"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="34"><h3 id="list-deathmatch-profiles">List deathmatch profiles</h3>
+<p>Deathmatch profiles are statistics related to the players deathmatch history. This route allows you to list the deathmatch profiles, retrieve 10 records per api call. Specify the pagenumber in the url and if there is no pagenumber provided it will return the first page by default. Note that in the example response only a single record is listed for brevity.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="35"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>/dmprofiles/<span class="strong">{pagenumber}</span></div>
+    </div>
+<h4 id="example-request-3">Example request</h4>
+<pre class='hljs'>$ curl https://api.bman.gg/dmprofiles/{pagenumber}</pre>
+<h4 id="example-response-3">Example response</h4>
+<pre class='hljs'>{
+    <span class="hljs-attr">"docs"</span>: [
+        {
+            <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5dcf84a5f97ad754e3b9a044"</span>,
+            <span class="hljs-attr">"player"</span>: {
+                <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198803977655"</span>
+            },
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-string">"27.07298087932027"</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-string">"0.7966123143415406"</span>,
+            <span class="hljs-attr">"kills"</span>: <span class="hljs-string">"115"</span>,
+            <span class="hljs-attr">"deaths"</span>: <span class="hljs-string">"103"</span>,
+            <span class="hljs-attr">"last_updated"</span>: <span class="hljs-string">"Wed Jan 15 2020 18:48:47 GMT-0500 (Eastern Standard Time)"</span>
+        },
+    ],
+    <span class="hljs-attr">"totalDocs"</span>: <span class="hljs-number">986</span>,
+    <span class="hljs-attr">"limit"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"totalPages"</span>: <span class="hljs-number">99</span>,
+    <span class="hljs-attr">"page"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"pagingCounter"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"hasPrevPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"hasNextPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"prevPage"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"nextPage"</span>: <span class="hljs-literal">null</span>
+}</pre>
+</div></div><div data-title="List of players ranked" class="keyline-top section contain clearfix " data-reactid="36"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="37"><h3 id="list-of-players-ranked">List of players ranked</h3>
+<p>This route is for returning a list of players ranked based on their Elo rating. It automatically performs the adjustment for sigma ratings. Pass in the optional page to get the corresponding page. Omitting it will return the first page.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="38"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>dmprofiles/rankings</div>
+    </div>
+<h4 id="example-request-4">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmprofiles/full/76561198140027269/platform/0</pre>
+<h4 id="example-response-4">Example response</h4>
+<pre class='hljs'>{
+    <span class="hljs-attr">"docs"</span>: [
+        {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">30.57994960821335</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.9425143812467252</span>,
+            <span class="hljs-attr">"result"</span>: <span class="hljs-number">27.752406464473175</span>,
+            <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Moon"</span>
+        },
+        {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">30.19622481800646</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.8166518500203079</span>,
+            <span class="hljs-attr">"result"</span>: <span class="hljs-number">27.746269267945536</span>,
+            <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Nova"</span>
+        },
+        ...
+    ],
+    <span class="hljs-attr">"totalDocs"</span>: <span class="hljs-number">381</span>,
+    <span class="hljs-attr">"limit"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"page"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"totalPages"</span>: <span class="hljs-number">39</span>,
+    <span class="hljs-attr">"pagingCounter"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"hasPrevPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"hasNextPage"</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">"prevPage"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"nextPage"</span>: <span class="hljs-number">2</span>
+}</pre>
+</div></div><div data-title="Get the full profile" class="keyline-top section contain clearfix " data-reactid="39"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="40"><h3 id="get-the-full-profile">Get the full profile</h3>
+<p>This basically combines all the data on a deathmatch profile and player profile. Provide a <code>profileID</code> and a <code>storeID</code> (steam, discord, itch.io, gamejolt) and it will return a deathmatch profile with all the information displayed in full.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="41"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>dmprofiles/full/<span class="strong">{profileID}</span>/platform/<span class="strong">{storeID}</span></div>
+    </div>
+<h4 id="example-request-5">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmprofiles/full/76561198140027269/platform/0</pre>
+<h4 id="example-response-5">Example response</h4>
+<pre class='hljs'>[
+    {
+        <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5dd03bb5e1d2bd59172151c2"</span>,
+        <span class="hljs-attr">"player"</span>: {
+            <span class="hljs-attr">"name"</span>: [
+                <span class="hljs-string">"White Fox"</span>,
+                <span class="hljs-string">"Bunny Boi"</span>
+            ],
+            <span class="hljs-attr">"_id"</span>: {
+                <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198140027269"</span>
+            },
+            <span class="hljs-attr">"color"</span>: <span class="hljs-string">"255"</span>,
+            <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"27"</span>,
+            <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"1"</span>
+        },
+        <span class="hljs-attr">"mu"</span>: <span class="hljs-string">"24.09227820175617"</span>,
+        <span class="hljs-attr">"sigma"</span>: <span class="hljs-string">"3.295183723276668"</span>,
+        <span class="hljs-attr">"kills"</span>: <span class="hljs-string">"0"</span>,
+        <span class="hljs-attr">"deaths"</span>: <span class="hljs-string">"0"</span>,
+        <span class="hljs-attr">"last_updated"</span>: <span class="hljs-string">"Sun Nov 17 2019 16:00:43 GMT-0500 (Eastern Standard Time)"</span>
+    }
+]</pre>
+</div></div><div data-title="Get a single player" class="keyline-top section contain clearfix " data-reactid="42"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="43"><h3 id="get-a-single-player">Get a single player</h3>
+<p>Gets the deathmatch profile of a single user. This doesn't combine the information from the player information. The reason to use this over the more detailed full profile is that it is two times faster. Use this endpoint when information on the player isn't completely essential. </p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="44"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>dmprofiles/<span class="strong">{profileID}</span>/platform/<span class="strong">{storeID}</span></div>
+    </div>
+<h4 id="example-request-6">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmprofiles/76561198140027269/platform/0</pre>
+<h4 id="example-response-6">Example response</h4>
+<pre class='hljs'>[
+    {
+        <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5dd03bb5e1d2bd59172151c2"</span>,
+        <span class="hljs-attr">"player"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198140027269"</span>
+        },
+        <span class="hljs-attr">"mu"</span>: <span class="hljs-string">"24.09227820175617"</span>,
+        <span class="hljs-attr">"sigma"</span>: <span class="hljs-string">"3.295183723276668"</span>,
+        <span class="hljs-attr">"kills"</span>: <span class="hljs-string">"0"</span>,
+        <span class="hljs-attr">"deaths"</span>: <span class="hljs-string">"0"</span>,
+        <span class="hljs-attr">"last_updated"</span>: <span class="hljs-string">"Sun Nov 17 2019 16:00:43 GMT-0500 (Eastern Standard Time)"</span>
+    }
+]</pre>
+</div></div><div data-title="Deathmatch Kills" class="keyline-top section contain clearfix " data-reactid="45"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="46"><h2 id="deathmatch-kills">Deathmatch Kills</h2>
+<p>These routes allow for the querying of information pertaining to kills. Kill data is useful for understanding the context of each elimination, this includes weapon used, death coordinates, and kill coordinates. Kills also uniquely reference a match which allows users to bundle kills into matches.</p>
+</div></div><div data-title="List deathmatch kills" class="keyline-top section contain clearfix " data-reactid="47"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="48"><h3 id="list-deathmatch-kills">List deathmatch kills</h3>
+<p>This will list deathmatch kills sorted in ascending time. As usual, you can optionally submit a page number and omitting it will simply return the first page. </p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="49"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>dmkills/<span class="strong">{page}</span></div>
+    </div>
+<h4 id="example-request-7">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmkills</pre>
+<h4 id="example-response-7">Example response</h4>
+<pre class='hljs'>{
+    <span class="hljs-attr">"docs"</span>: [
+        {
+            <span class="hljs-attr">"killer_rating"</span>: {
+                <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.678012029874072</span>,
+                <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7906125269412195</span>,
+                <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">0.09591250758511904</span>,
+                <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0003333979958908273</span>
+            },
+            <span class="hljs-attr">"victim_rating"</span>: {
+                <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.76942863425856</span>,
+                <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7955871372882849</span>,
+                <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">-0.09713812389775</span>,
+                <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0004520302848265434</span>
+            },
+            <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5e2399608ab5eb05970bd3cb"</span>,
+            <span class="hljs-attr">"killer"</span>: {
+                <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198238477762"</span>
+            },
+            <span class="hljs-attr">"victim"</span>: {
+                <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198386200919"</span>
+            },
+            <span class="hljs-attr">"weapon"</span>: <span class="hljs-string">"20"</span>,
+            <span class="hljs-attr">"killer_location"</span>: <span class="hljs-string">"5782.67,2399.97"</span>,
+            <span class="hljs-attr">"victim_location"</span>: <span class="hljs-string">"5200.52,2424.99"</span>,
+            <span class="hljs-attr">"date_created"</span>: <span class="hljs-string">"2020-01-18T23:33:50.575Z"</span>,
+            <span class="hljs-attr">"match"</span>: <span class="hljs-string">"5e2398018ab5eb05970bd3c5"</span>
+        },
+        ...
+    ],
+    <span class="hljs-attr">"totalDocs"</span>: <span class="hljs-number">54351</span>,
+    <span class="hljs-attr">"limit"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"totalPages"</span>: <span class="hljs-number">5436</span>,
+    <span class="hljs-attr">"page"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"pagingCounter"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"hasPrevPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"hasNextPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"prevPage"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"nextPage"</span>: <span class="hljs-literal">null</span></pre>
+</div></div><div data-title="List of deathmatch kills populated" class="keyline-top section contain clearfix " data-reactid="50"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="51"><h3 id="list-of-deathmatch-kills-populated">List of deathmatch kills populated</h3>
+<p>With this API endpoint you can display the full player information. It will fill in all the information from the player information from the Players database. Please use this sparingly as it is a rather slow operation. Page number is optional. There is a massive amount of information sent back...</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="52"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>dmkills/full/<span class="strong">{page}</span></div>
+    </div>
+<h4 id="example-request-8">Example request</h4>
+<h4 id="example-request-9">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmkills/full/1</pre>
+<h4 id="example-response-8">Example response</h4>
+<pre class='hljs'>{
+    <span class="hljs-attr">"docs"</span>: [
+        {
+            <span class="hljs-attr">"killer_rating"</span>: {
+                <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.678012029874072</span>,
+                <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7906125269412195</span>,
+                <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">0.09591250758511904</span>,
+                <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0003333979958908273</span>
+            },
+            <span class="hljs-attr">"victim_rating"</span>: {
+                <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.76942863425856</span>,
+                <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7955871372882849</span>,
+                <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">-0.09713812389775</span>,
+                <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0004520302848265434</span>
+            },
+            <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5e2399608ab5eb05970bd3cb"</span>,
+            <span class="hljs-attr">"killer"</span>: [
+                {
+                    <span class="hljs-attr">"_id"</span>: {
+                        <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                        <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198238477762"</span>
+                    },
+                    <span class="hljs-attr">"name"</span>: [
+                        <span class="hljs-string">"Taterazay"</span>
+                    ],
+                    <span class="hljs-attr">"color"</span>: <span class="hljs-string">"0"</span>,
+                    <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"19"</span>,
+                    <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"1"</span>
+                },
+                {
+                    <span class="hljs-attr">"_id"</span>: {
+                        <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                        <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198386200919"</span>
+                    },
+                    <span class="hljs-attr">"name"</span>: [
+                        <span class="hljs-string">"chengkinhoken"</span>
+                    ],
+                    <span class="hljs-attr">"color"</span>: <span class="hljs-string">"16777215"</span>,
+                    <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"0"</span>,
+                    <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"0"</span>
+                }
+            ],
+            <span class="hljs-attr">"victim"</span>: [
+                {
+                    <span class="hljs-attr">"_id"</span>: {
+                        <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                        <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198238477762"</span>
+                    },
+                    <span class="hljs-attr">"name"</span>: [
+                        <span class="hljs-string">"Taterazay"</span>
+                    ],
+                    <span class="hljs-attr">"color"</span>: <span class="hljs-string">"0"</span>,
+                    <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"19"</span>,
+                    <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"1"</span>
+                },
+                {
+                    <span class="hljs-attr">"_id"</span>: {
+                        <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+                        <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198386200919"</span>
+                    },
+                    <span class="hljs-attr">"name"</span>: [
+                        <span class="hljs-string">"chengkinhoken"</span>
+                    ],
+                    <span class="hljs-attr">"color"</span>: <span class="hljs-string">"16777215"</span>,
+                    <span class="hljs-attr">"hat"</span>: <span class="hljs-string">"0"</span>,
+                    <span class="hljs-attr">"premium"</span>: <span class="hljs-string">"0"</span>
+                }
+            ],
+            <span class="hljs-attr">"weapon"</span>: <span class="hljs-string">"20"</span>,
+            <span class="hljs-attr">"killer_location"</span>: <span class="hljs-string">"5782.67,2399.97"</span>,
+            <span class="hljs-attr">"victim_location"</span>: <span class="hljs-string">"5200.52,2424.99"</span>,
+            <span class="hljs-attr">"date_created"</span>: <span class="hljs-string">"2020-01-18T23:33:50.575Z"</span>,
+            <span class="hljs-attr">"match"</span>: {
+                <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5e2398018ab5eb05970bd3c5"</span>,
+                <span class="hljs-attr">"map_name"</span>: <span class="hljs-string">"Boring Lake"</span>,
+                <span class="hljs-attr">"date_created"</span>: <span class="hljs-string">"2020-01-18T23:33:50.534Z"</span>,
+                <span class="hljs-attr">"date_ended"</span>: <span class="hljs-string">"2020-01-18T23:53:31.899Z"</span>
+            }
+        },
+        ...
+    ],
+    <span class="hljs-attr">"totalDocs"</span>: <span class="hljs-number">54351</span>,
+    <span class="hljs-attr">"limit"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"totalPages"</span>: <span class="hljs-number">5436</span>,
+    <span class="hljs-attr">"page"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"pagingCounter"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"hasPrevPage"</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">"hasNextPage"</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">"prevPage"</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">"nextPage"</span>: <span class="hljs-number">2</span>
+}</pre>
+</div></div><div data-title="Get all the kills from a match" class="keyline-top section contain clearfix " data-reactid="53"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="54"><h3 id="get-all-the-kills-from-a-match">Get all the kills from a match</h3>
+<p>Sometimes you want to see a list of every kill that occured during a deathmatch game. This is the endpoint to do that. Pass in the unique ID corresponding to every match.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="55"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>https://api.bman.gg/dmkills/findMatch</div>
+    </div>
+<h4 id="example-request-10">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmkills/match/5e2398018ab5eb05970bd3c5</pre>
+<h4 id="example-response-9">Example response</h4>
+<pre class='hljs'>[
+    {
+        <span class="hljs-attr">"killer_rating"</span>: {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.678012029874072</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7906125269412195</span>,
+            <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">0.09591250758511904</span>,
+            <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0003333979958908273</span>
+        },
+        <span class="hljs-attr">"victim_rating"</span>: {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.76942863425856</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7955871372882849</span>,
+            <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">-0.09713812389775</span>,
+            <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.0004520302848265434</span>
+        },
+        <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5e2399608ab5eb05970bd3cb"</span>,
+        <span class="hljs-attr">"killer"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198238477762"</span>
+        },
+        <span class="hljs-attr">"victim"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198386200919"</span>
+        },
+        <span class="hljs-attr">"weapon"</span>: <span class="hljs-string">"20"</span>,
+        <span class="hljs-attr">"killer_location"</span>: <span class="hljs-string">"5782.67,2399.97"</span>,
+        <span class="hljs-attr">"victim_location"</span>: <span class="hljs-string">"5200.52,2424.99"</span>,
+        <span class="hljs-attr">"date_created"</span>: <span class="hljs-string">"2020-01-18T23:33:50.575Z"</span>,
+        <span class="hljs-attr">"match"</span>: <span class="hljs-string">"5e2398018ab5eb05970bd3c5"</span>
+    },
+    ...
+]</pre>
+</div></div><div data-title="Get all the kills from a certain player" class="keyline-top section contain clearfix " data-reactid="56"><div class="space-bottom8 col6 pad2x prose clip" data-reactid="57"><h3 id="get-all-the-kills-from-a-certain-player">Get all the kills from a certain player</h3>
+<p>This endpoint is for retrieving the list of all kills gotten by a certain player. Provide the <code>profileID</code> and <code>storeID</code> to ensure that you get the kills for the correct player. <code>page</code> is optional.</p>
+</div><div class="space-bottom4 col6 pad2 prose clip fill-light space-top5" data-reactid="58"><div class='endpoint dark fill-dark round '>
+      <div class='round-left pad0y pad1x fill-lighten0 code small endpoint-method'>GET</div>
+      <div class='pad0 code small endpoint-url'>https://api.bman.gg/dmkills/<span class="strong">{profileID}</span>/platform/<span class="strong">{platformID}</span>/<span class="strong">{page}</span></div>
+    </div>
+<h4 id="example-request-11">Example request</h4>
+<pre class='hljs'>curl https://api.bman.gg/dmkills/76561198386200919/platform/0</pre>
+<h4 id="example-response-10">Example response</h4>
+<pre class='hljs'>[
+    {
+        <span class="hljs-attr">"killer_rating"</span>: {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.99689278551442</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7919372021967669</span>,
+            <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">0.08861771931542961</span>,
+            <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.00020557683284050388</span>
+        },
+        <span class="hljs-attr">"victim_rating"</span>: {
+            <span class="hljs-attr">"mu"</span>: <span class="hljs-number">27.45321244953377</span>,
+            <span class="hljs-attr">"sigma"</span>: <span class="hljs-number">0.7880848710982954</span>,
+            <span class="hljs-attr">"mu_delta"</span>: <span class="hljs-number">-0.08774767858041699</span>,
+            <span class="hljs-attr">"sigma_delta"</span>: <span class="hljs-number">-0.00011647419008775639</span>
+        },
+        <span class="hljs-attr">"_id"</span>: <span class="hljs-string">"5e239a418ab5eb05970bd3d6"</span>,
+        <span class="hljs-attr">"killer"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198386200919"</span>
+        },
+        <span class="hljs-attr">"victim"</span>: {
+            <span class="hljs-attr">"platform"</span>: <span class="hljs-string">"0"</span>,
+            <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"76561198238477762"</span>
+        },
+        <span class="hljs-attr">"weapon"</span>: <span class="hljs-string">"10"</span>,
+        <span class="hljs-attr">"killer_location"</span>: <span class="hljs-string">"4781.96,2345.38"</span>,
+        <span class="hljs-attr">"victim_location"</span>: <span class="hljs-string">"5162.49,2462.20"</span>,
+        <span class="hljs-attr">"date_created"</span>: <span class="hljs-string">"2020-01-18T23:33:50.575Z"</span>,
+        <span class="hljs-attr">"match"</span>: <span class="hljs-string">"5e2398018ab5eb05970bd3c5"</span>
+    },
+    ...
+]</pre>
+</div></div></div></div></div><div class="fixed-top space-left16" data-reactid="59"><div class="events fill-light bottom-shadow pad1 col6 pin-topright  " data-reactid="60"><div class="space-right1 small quiet inline" data-reactid="61">Show examples in:</div><div class="rounded-toggle inline short" data-reactid="62"><a class="strong active" data-reactid="63">cURL</a><a class="strong " data-reactid="64">Python</a><a class="strong " data-reactid="65">JS</a></div><div class="fr pad0" data-reactid="66"><a title="Display as 1 column" style="cursor:pointer;" class="icon quiet caret-left pad0 fill-darken0 round" data-reactid="67"></a></div></div></div><div class="fill-dark dark bottom-shadow fixed-top pad0 width16" data-reactid="68"><a href="/" class="active space-top1 space-left1 pin-topleft icon round dark pad0 fill-blue" data-reactid="69"></a><div class="strong small pad0
+          
+          space-left4 line-height15" data-reactid="70">DysonCity API Documentation</div></div></div></div><!--STOP-->
+    <script src='bundle.js'></script>
+  </body>
+</html>
