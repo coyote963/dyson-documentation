@@ -1,4 +1,4 @@
-## About Players
+## Players Profiles
 
 Endpoints relating to players. Player is the base model that gamemode profiles are based off of. Each player endpoint is uniquely identified by their "platform" and "profile". Platform is what game store they got bman from `0 = steam, 1 = discord, 2 = itch.io 3 = gamejolt`. The colors of each player is stored as a gamejolt color value
 
